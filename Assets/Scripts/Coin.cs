@@ -9,7 +9,7 @@ public class Coin : MonoBehaviour
 {
 
     // Called when something hits the Coin
-    void OnCollisionEnter2D(Collision2D col)
+    void OnTriggerEnter2D(Collider2D col)
     {
 
         // Play coin sound

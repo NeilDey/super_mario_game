@@ -5,6 +5,7 @@ using UnityEngine;
 public class Manny : MonoBehaviour {
 
     public float speed = 5f;
+    public float wallJumpY = 10f;
 
     private SpriteRenderer sr;
     private Rigidbody2D rb;
@@ -35,6 +36,15 @@ public class Manny : MonoBehaviour {
         // Change x and keep y as is
         rb.velocity = new Vector2(horzMove * speed, vect.y);
 
+                // If Manny is jumping next to a wall his velocity will
+        // go up in the Y direction
+        if (IsWallOnLeftOrRight() && !IsOnGround() && horzMove == 1)
+                {
+
+                    rb.velocity = new Vector2(-GetWallDirection() * speed * -.75f,
+                    wallJumpY);
+                }
+
         // Set the speed so the right Animation is played
         animator.SetFloat("Speed", Mathf.Abs(horzMove));
 
@@ -53,6 +63,7 @@ public class Manny : MonoBehaviour {
             if (vertMove > 0f)
             {
                 isJumping = true;
+                SoundManager.Instance.PlayOneShot(SoundManager.Instance.jump);
             }
         }
 
@@ -129,14 +140,56 @@ public class Manny : MonoBehaviour {
         scale.x *= -1;
         transform.localScale = scale;
     }
-    
-  
-   
+
+    public bool IsWallOnLeft()
+    {
+        return Physics2D.Raycast(new Vector2(transform.position.x - width,
+            transform.position.y),
+            -Vector2.right,
+            rayCastLength);
+    }
+
+        public bool IsWallOnRight() {
+        return Physics2D.Raycast(new Vector2(transform.position.x + width,
+            transform.position.y),
+            Vector2.right,
+            rayCastLength);
+    }
+    // Verifies if walls are on left or right for wall jumping
+    public bool IsWallOnLeftOrRight()
+    {
+
+        if (IsWallOnLeft() || IsWallOnRight())
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    // Gets the wall direction if it exists
+    // Multiply the results against Manny’s X velocity
+    public int GetWallDirection()
+    {
+        if (IsWallOnLeft())
+        {
+            return -1;
+        }
+        else if (IsWallOnRight())
+        {
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
+    }
     // If Manny falls off the screen destroy the game object
-    /*
-	void OnBecameInvisible(){
+
+    void OnBecameInvisible(){
 		Debug.Log ("Manny Destroyed");
 		Destroy (gameObject);
 	}
-	*/
+	
 }
